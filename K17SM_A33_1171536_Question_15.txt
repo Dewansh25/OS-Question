@@ -1,0 +1,98 @@
+#include <stdio.h>
+#include<conio.h>
+#include<time.h>
+#include<stdlib.h>
+#define MAX 10000
+void delay(double number_of_seconds) 
+{
+    double milli_seconds = 1000 * number_of_seconds; 
+    clock_t start_time = clock(); 
+    while (clock() < start_time + milli_seconds); 
+}
+
+struct process
+{
+	int a; // arrival
+	int b;  // burst time 
+	int pid;  // process id
+	int c;  // completion time
+	int w; // waiting time
+	int t; // turn around time 
+	int temp_b;  // to hold the initial burst time
+};
+
+void printScenario(struct process p[],int len)
+{
+	printf("\n\n    --------------------------------------------------------------------------------------------------------------------------- \n");
+	printf("    |  Process    |    Arrival Time    |   Burst Time  |      Completion Time     |     Waiting Time     |   Turn-Around Time \n");
+	printf("    -------------------------------------------------------------------------------------------------------------------------- \n");
+	for(int i=0;i<len;i++)
+	{
+		printf("        P%d                 %d                   %d               %d                       %d                      %d\n",p[i].pid,p[i].a,p[i].temp_b,p[i].c,p[i].w,p[i].t);
+	}
+} 
+
+int main() 
+{
+	int n;int time,count = 0,min;
+    double wait_time = 0, turnaround_time = 0, end;
+    float average_waiting_time, average_turnaround_time;
+	printf("\n\n\n\n -----------  | Question 15 : Priority Scheduling ( Shortest Remaining Time First : Pre-emptive ) |  -----------\n\n");
+	printf("\n | Enter the number of processes  | :  ");
+	scanf("%d",&n);
+	struct process p[n+1];
+	for(int i=0;i<n;i++)
+	{
+		p[i].pid=i+1;
+        printf("\n | Enter The Arrival Time of Process P%d  | :  ",i+1);
+		scanf("%d",&p[i].a);
+		printf("\n | Enter The Burst Time of Process P%d  | : ",i+1);
+		scanf("%d",&p[i].b);
+		p[i].temp_b=p[i].b;
+		p[i].c=0;
+	}	
+	system("cls");
+	delay(0.5);
+	printf("\n\n   Processing");
+	delay(0.5);
+	printf(".");
+	delay(0.5);
+	printf(".");
+	delay(0.5);
+	printf(".");
+	
+	p[n].b = MAX;
+	time = 0;
+	while(count != n)
+    {
+        min = n;
+        for(int i = 0; i < n; i++)
+		{
+            if(p[i].a <= time && p[i].b < p[min].b && p[i].b > 0)
+            {
+                min = i;
+            }
+        }
+        p[min].b--;
+        if(p[min].b == 0)
+        {
+            count++;
+            p[min].c = time + 1;
+            wait_time = wait_time + p[min].c - p[min].a - p[min].temp_b;
+            turnaround_time = turnaround_time + p[min].c - p[min].a;
+        }
+        time++;
+    }
+    for(int i=0;i<n;i++)
+    {
+    	p[i].w = p[i].c - (p[i].a + p[i].temp_b);
+    	p[i].t = p[i].c - (p[i].a);
+	}
+    average_waiting_time = wait_time / n; 
+    average_turnaround_time = turnaround_time / n;
+    printScenario(p,n);
+    printf("\n\n     --- | Average Waiting Time | : ---\t| %lf |\n", average_waiting_time);
+    printf("\n     --- | Average Turn-Around Time | : ---\t| %lf |\n", average_turnaround_time);
+    getch();
+    return 0;
+}
